@@ -1,4 +1,9 @@
 ## Quick start
 
 export OTEL_JAVAAGENT_DEBUG=true
-sbt clean stage
+
+In separate terminal `python3 server.py`
+
+`sbt clean stage`
+
+`./target/universal/stage/bin/tapirtest`

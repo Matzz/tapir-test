@@ -12,7 +12,7 @@ import scala.concurrent.Future
 object AkkaRoutes {
   val raw: Route = {
     get {
-      path("hello" / "3" / Segment / "end") { name =>
+      path("hello" / "3" / Segment ) { name =>
         println(s"Hello ${name}\n")
         complete(
           StatusCodes.OK,

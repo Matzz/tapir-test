@@ -15,10 +15,10 @@ import scala.io.StdIn.readLine
 object Main extends App {
 
   val namePath: EndpointInput.PathCapture[String] = path[String]("name")
-  val nameQueryPath: EndpointInput.Query[Option[String]] = query[Option[String]]("sportId")
+  val nameQueryPath: EndpointInput.Query[Option[String]] = query[Option[String]]("name")
 
   val helloServerEndpoint: ServerEndpoint[Any, Future] = endpoint.get
-    .in("hello" / "1" / "2" / namePath)
+    .in("hello" / "1" / namePath)
     .name("hello1")
     .in(nameQueryPath)
     .out(stringBody)
@@ -26,7 +26,7 @@ object Main extends App {
       case (name, nameOpt) => Future.successful(s"Hello ${name} ${nameOpt.getOrElse("")}\n")
     }
   val helloServerEndpoint2: ServerEndpoint[Any, Future] = endpoint.get
-    .in("hello" / "2" / "1" / namePath)
+    .in("hello" / "2" / namePath)
     .name("hello2")
     .out(stringBody)
     .serverLogicSuccess(name => Future.successful(s"Hello2 ${name}\n"))
