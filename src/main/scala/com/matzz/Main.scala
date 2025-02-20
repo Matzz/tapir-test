@@ -5,14 +5,17 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.RouteConcatenation._
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.akkahttp.AkkaHttpServerInterpreter
+import sttp.tapir.server.akkahttp.{AkkaHttpServerInterpreter, AkkaHttpServerOptions}
+import sttp.tapir.server.interceptor.metrics.MetricsRequestInterceptor
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.io.StdIn.readLine
 
+
 object Main extends App {
+
 
   val namePath: EndpointInput.PathCapture[String] = path[String]("name")
   val nameQueryPath: EndpointInput.Query[Option[String]] = query[Option[String]]("name")
@@ -35,8 +38,13 @@ object Main extends App {
 
   implicit val system: ActorSystem = ActorSystem.create()
 
+  lazy val metricsInterceptor = new MetricsRequestInterceptor(List(OTELInterceptor.otelMetric), Seq.empty)
+  lazy val serverOptions = AkkaHttpServerOptions.customiseInterceptors
+    .metricsInterceptor(metricsInterceptor)
+    .options
+
   def route(endpoint: ServerEndpoint[Any, Future]) =
-    AkkaHttpServerInterpreter().toRoute(endpoint)
+    AkkaHttpServerInterpreter(serverOptions).toRoute(endpoint)
 
   val program = Http()
     .newServerAt("localhost", 8080)
